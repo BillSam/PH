@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Piga Hacks Tool</title>
+    <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <h1>Piga Hacks - Bug Bounty Automation Tool</h1>
+    <div>
+        <label for="domain">Enter Domain:</label>
+        <input type="text" id="domain" placeholder="example.com">
+    </div>
+    <div>
+        <label for="scan_type">Select Scan Type:</label>
+        <select id="scan_type">
+            <option value="full_recon">Comprehensive Reconnaissance</option>
+            <option value="subdomain_enum">Subdomain Enumeration</option>
+            <option value="dns_enum">DNS Enumeration</option>
+            <!-- Add more options as needed -->
+        </select>
+    </div>
+    <button id="start_scan">Start Scan</button>
+
+    <h2>Scan Results</h2>
+    <pre id="scan_results"></pre>
+
+    <script>
+        const socket = io.connect('http://localhost:5000');
+
+        $('#start_scan').click(function() {
+            const domain = $('#domain').val();
+            const scanType = $('#scan_type').val();
+
+            if (!domain) {
+                alert("Please enter a domain");
+                return;
+            }
+
+            $.post('/api/start_scan', JSON.stringify({ domain, scan_type: scanType }), function(data) {
+                if (data.status === "success") {
+                    alert(data.message);
+                    fetchScanResults(domain, scanType);
+                } else {
+                    alert("Failed to start scan");
+                }
+            }, 'json');
+        });
+
+        function fetchScanResults(domain, scanType) {
+            $.get('/api/get_scan_results', { domain, scan_type: scanType }, function(data) {
+                if (data.status === "success") {
+                    $('#scan_results').text(data.result);
+                } else {
+                    $('#scan_results').text("Failed to retrieve results");
+                }
+            });
+        }
+    </script>
+</body>
+</html>
