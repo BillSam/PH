@@ -79,12 +79,18 @@ command_exists() {
     command -v "$1" >/dev/null 2>&1
 }
 
-# Function to run a command and handle errors
-run_command() {
-    if command_exists "$1"; then
-        "$@"
+# Function to run a command in a new terminal
+run_in_new_terminal() {
+    local title="$1"
+    shift
+    if command_exists gnome-terminal; then
+        gnome-terminal --title="$title" -- bash -c "$*; echo 'Press Enter to close this window'; read"
+    elif command_exists xterm; then
+        xterm -T "$title" -e bash -c "$*; echo 'Press Enter to close this window'; read"
     else
-        echo "Error: $1 is not installed or not in PATH. Skipping this step."
+        echo "Error: Neither gnome-terminal nor xterm found. Unable to open new terminal window."
+        echo "Running command in current terminal:"
+        bash -c "$*"
     fi
 }
 
@@ -98,38 +104,40 @@ function run_full_recon() {
 
     echo "[+] Starting comprehensive reconnaissance and vulnerability scanning for $DOMAIN"
 
-    run_subdomain_enum
-    run_dns_enum
-    run_ip_resolution
-    run_web_probe
-    run_vuln_scan
-    run_git_exposure_check
-    run_s3_enum
-    run_js_analysis
-    run_ssl_tls_analysis
-    run_cors_check
-    run_tech_stack_identification
-    run_email_harvesting
-    run_subdomain_takeover_check
-    run_dns_zone_transfer
-    run_ct_logs
-    run_vhost_fuzzing
-    run_api_discovery
-    run_wayback_crawl
-    run_sqli_scan
-    run_xss_scan
-    run_open_redirect_check
-    run_ssrf_scan
-    run_graphql_introspection
-    run_crlf_injection
-    run_xxe_scan
-    run_ssti_check
-    run_websocket_analysis
-    run_http_smuggling
-    run_cache_poisoning
-    run_csti_check
+    run_in_new_terminal "Full Recon" "
+        ./$(basename "$0") run_subdomain_enum;
+        ./$(basename "$0") run_dns_enum;
+        ./$(basename "$0") run_ip_resolution;
+        ./$(basename "$0") run_web_probe;
+        ./$(basename "$0") run_vuln_scan;
+        ./$(basename "$0") run_git_exposure_check;
+        ./$(basename "$0") run_s3_enum;
+        ./$(basename "$0") run_js_analysis;
+        ./$(basename "$0") run_ssl_tls_analysis;
+        ./$(basename "$0") run_cors_check;
+        ./$(basename "$0") run_tech_stack_identification;
+        ./$(basename "$0") run_email_harvesting;
+        ./$(basename "$0") run_subdomain_takeover_check;
+        ./$(basename "$0") run_dns_zone_transfer;
+        ./$(basename "$0") run_ct_logs;
+        ./$(basename "$0") run_vhost_fuzzing;
+        ./$(basename "$0") run_api_discovery;
+        ./$(basename "$0") run_wayback_crawl;
+        ./$(basename "$0") run_sqli_scan;
+        ./$(basename "$0") run_xss_scan;
+        ./$(basename "$0") run_open_redirect_check;
+        ./$(basename "$0") run_ssrf_scan;
+        ./$(basename "$0") run_graphql_introspection;
+        ./$(basename "$0") run_crlf_injection;
+        ./$(basename "$0") run_xxe_scan;
+        ./$(basename "$0") run_ssti_check;
+        ./$(basename "$0") run_websocket_analysis;
+        ./$(basename "$0") run_http_smuggling;
+        ./$(basename "$0") run_cache_poisoning;
+        ./$(basename "$0") run_csti_check;
+    "
 
-    echo "[+] Comprehensive reconnaissance and vulnerability scanning completed. Results saved in $OUTPUT_DIR"
+    echo "[+] Comprehensive reconnaissance and vulnerability scanning started in a new terminal window."
     read -p "Press Enter to continue"
 }
 
@@ -443,41 +451,51 @@ function menu_loop() {
         case $option in
             1) set_target_domain ;;
             2) run_full_recon ;;
-            3) run_subdomain_enum ;;
-            4) run_dns_enum ;;
-            5) run_ip_resolution ;;
-            6) run_web_probe ;;
-            7) run_vuln_scan ;;
-            8) run_git_exposure_check ;;
-            9) run_s3_enum ;;
-            10) run_js_analysis ;;
-            11) run_ssl_tls_analysis ;;
-            12) run_cors_check ;;
-            13) run_tech_stack_identification ;;
-            14) run_email_harvesting ;;
-            15) run_subdomain_takeover_check ;;
-            16) run_dns_zone_transfer ;;
-            17) run_ct_logs ;;
-            18) run_vhost_fuzzing ;;
-            19) run_api_discovery ;;
-            20) run_wayback_crawl ;;
-            21) run_sqli_scan ;;
-            22) run_xss_scan ;;
-            23) run_open_redirect_check ;;
-            24) run_ssrf_scan ;;
-            25) run_graphql_introspection ;;
-            26) run_crlf_injection ;;
-            27) run_xxe_scan ;;
-            28) run_ssti_check ;;
-            29) run_websocket_analysis ;;
-            30) run_http_smuggling ;;
-            31) run_cache_poisoning ;;
-            32) run_csti_check ;;
+            3) run_in_new_terminal "Subdomain Enumeration" "./$(basename "$0") run_subdomain_enum" ;;
+            4) run_in_new_terminal "DNS Enumeration" "./$(basename "$0") run_dns_enum" ;;
+            5) run_in_new_terminal "IP Resolution" "./$(basename "$0") run_ip_resolution" ;;
+            6) run_in_new_terminal "Web Probe" "./$(basename "$0") run_web_probe" ;;
+            7) run_in_new_terminal "Vulnerability Scan" "./$(basename "$0") run_vuln_scan" ;;
+            8) run_in_new_terminal "Git Exposure Check" "./$(basename "$0") run_git_exposure_check" ;;
+            9) run_in_new_terminal "S3 Bucket Enumeration" "./$(basename "$0") run_s3_enum" ;;
+            10) run_in_new_terminal "JavaScript Analysis" "./$(basename "$0") run_js_analysis" ;;
+            11) run_in_new_terminal "SSL/TLS Analysis" "./$(basename "$0") run_ssl_tls_analysis" ;;
+            12) run_in_new_terminal "CORS Check" "./$(basename "$0") run_cors_check" ;;
+            13) run_in_new_terminal "Tech Stack Identification" "./$(basename "$0") run_tech_stack_identification" ;;
+            14) run_in_new_terminal "Email Harvesting" "./$(basename "$0") run_email_harvesting" ;;
+            15) run_in_new_terminal "Subdomain Takeover Check" "./$(basename "$0") run_subdomain_takeover_check" ;;
+            16) run_in_new_terminal "DNS Zone Transfer" "./$(basename "$0") run_dns_zone_transfer" ;;
+            17) run_in_new_terminal "CT Logs" "./$(basename "$0") run_ct_logs" ;;
+            18) run_in_new_terminal "VHost Fuzzing" "./$(basename "$0") run_vhost_fuzzing" ;;
+            19) run_in_new_terminal "API Discovery" "./$(basename "$0") run_api_discovery" ;;
+            20) run_in_new_terminal "Wayback Crawl" "./$(basename "$0") run_wayback_crawl" ;;
+            21) run_in_new_terminal "SQLi Scan" "./$(basename "$0") run_sqli_scan" ;;
+            22) run_in_new_terminal "XSS Scan" "./$(basename "$0") run_xss_scan" ;;
+            23) run_in_new_terminal "Open Redirect Check" "./$(basename "$0") run_open_redirect_check" ;;
+            24) run_in_new_terminal "SSRF Scan" "./$(basename "$0") run_ssrf_scan" ;;
+            25) run_in_new_terminal "GraphQL Introspection" "./$(basename "$0") run_graphql_introspection" ;;
+            26) run_in_new_terminal "CRLF Injection" "./$(basename "$0") run_crlf_injection" ;;
+            27) run_in_new_terminal "XXE Scan" "./$(basename "$0") run_xxe_scan" ;;
+            28) run_in_new_terminal "SSTI Check" "./$(basename "$0") run_ssti_check" ;;
+            29) run_in_new_terminal "WebSocket Analysis" "./$(basename "$0") run_websocket_analysis" ;;
+            30) run_in_new_terminal "HTTP Smuggling" "./$(basename "$0") run_http_smuggling" ;;
+            31) run_in_new_terminal "Cache Poisoning" "./$(basename "$0") run_cache_poisoning" ;;
+            32) run_in_new_terminal "CSTI Check" "./$(basename "$0") run_csti_check" ;;
             33) echo "Exiting..."; exit 0 ;;
             *) echo "Invalid option. Press Enter to continue."; read -r ;;
         esac
     done
 }
+
+# Check if a function name is passed as an argument
+if [[ "$1" == run_* ]] && [[ $(type -t "$1") == function ]]; then
+    if [ -z "$DOMAIN" ]; then
+        echo "Error: Target domain not set. Please run the script without arguments first."
+        exit 1
+    fi
+    $1
+    exit 0
+fi
 
 # Start the menu loop
 menu_loop
